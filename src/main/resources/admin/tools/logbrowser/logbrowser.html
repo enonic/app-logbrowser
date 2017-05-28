@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, user-scalable=no">
+    <title>Log Browser</title>
+    <link rel="stylesheet" type="text/css" href="{{assetsUri}}/css/logbrowser.css">
+    <link rel="shortcut icon" href="{{assetsUri}}/img/logbrowser.png">
+</head>
+<body>
+<div class="appbar">
+    <button class="home-button">
+        <span class="home-button-text">Log Browser</span>
+    </button>
+    <span class="cursor-blink"></span>
+
+    <div class="lt-appbarmiddle">
+        <button id="startBut" class="lt-start-button lt-button">
+            <span>Start</span>
+        </button>
+        <button id="upBut" class="lt-up-button lt-button">
+            <span>&#9650;</span>
+        </button>
+        <button id="downBut" class="lt-down-button lt-button">
+            <span>&#9660;</span>
+        </button>
+        <button id="endBut" class="lt-end-button lt-button">
+            <span>End</span>
+        </button>
+        <button id="tailBut" class="lt-tail-button lt-button">
+            <span>Follow</span>
+        </button>
+        <div class="lt-position">
+            <input id="position-slider" class="slider" type="range" min="0" max="1000" step="10" value="0"/>
+        </div>
+    </div>
+</div>
+
+<div class="lt-main-container">
+    <div class="lt-screen">
+        <span class="lt-logline">…</span>
+    </div>
+
+</div>
+
+<script type="text/javascript">var CONFIG = {portalAssetsUrl: '{{adminUiAssetsUrl}}', appId: 'logbrowser'};
+var SVC_URL = '{{svcUrl}}';</script>
+<script type="text/javascript" src="{{assetsUri}}/js/jquery-3.2.1.min.js"></script>
+<script type="text/javascript" src="{{assetsUri}}/js/logbrowser-tool.js"></script>
+</body>
+</html>
