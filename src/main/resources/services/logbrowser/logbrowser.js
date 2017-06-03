@@ -38,7 +38,7 @@ var getLines = function (req, action) {
 
 var handleGet = function (req) {
     if (req.webSocket) {
-        log.info('Websocket connected');
+        // log.info('Websocket connected');
         return {
             webSocket: {
                 data: {},
@@ -56,7 +56,7 @@ var handleWebSocket = function (event) {
     var sessionId = event.session.id;
     switch (event.type) {
     case 'open':
-        log.info('Websocket open: ' + sessionId);
+        // log.info('Websocket open: ' + sessionId);
 
         // first send last page
         var lineCount = event.session.params['lineCount'] || 10;
