@@ -6,7 +6,6 @@ import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -52,7 +51,7 @@ public class LogFileHandler
     private LogContext readLog()
         throws IOException
     {
-        final Path logPath = getLogPath();
+        final Path logPath = LogHelper.getLogPath();
         if ( !Files.exists( logPath ) )
         {
             return new LogContext( 0 );
@@ -277,16 +276,6 @@ public class LogFileHandler
             reverse( byteArray );
         }
         return new String( byteArray, StandardCharsets.UTF_8 );
-    }
-
-    private Path getLogPath()
-    {
-        final String xpHome = System.getenv( "XP_HOME" );
-        if ( xpHome == null )
-        {
-            throw new RuntimeException( "" );
-        }
-        return Paths.get( xpHome, "logs", "server.log" );
     }
 
     private void reverse( final byte[] array )

@@ -38,7 +38,7 @@ var getLines = function (req, action) {
 
 var handleGet = function (req) {
     if (req.webSocket) {
-
+        log.info('Websocket connected');
         return {
             webSocket: {
                 data: {},
@@ -56,15 +56,31 @@ var handleWebSocket = function (event) {
     var sessionId = event.session.id;
     switch (event.type) {
     case 'open':
-        //webSocketLib.addToGroup(WS_GROUP_NAME, sessionId);
+        log.info('Websocket open: ' + sessionId);
+
+        // first send last page
+        var lineCount = event.session.params['lineCount'] || 10;
+        var lastLinesResult = logFileLib.getLines({
+            lineCount: lineCount,
+            from: -1,
+            action: 'end'
+        });
+        webSocketLib.send(sessionId, JSON.stringify(lastLinesResult));
+
+        // start listening and sending new lines
+        logFileLib.newLogListener(sessionId, lastLinesResult.size,lineCount, function (lines) {
+            var msg = JSON.stringify(lines);
+            webSocketLib.send(sessionId, msg);
+        });
         break;
 
     case 'message':
-        // handleMessage(event);
+        // log.info('Websocket message: ' + sessionId);
         break;
 
     case 'close':
-        //webSocketLib.removeFromGroup(WS_GROUP_NAME, sessionId);
+        // log.info('Websocket close: ' + sessionId);
+        logFileLib.cancelLogListener(sessionId);
         break;
     }
 };

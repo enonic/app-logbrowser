@@ -1,16 +1,19 @@
 (function ($, svcUrl) {
     "use strict";
 
-    var $ltScreen, $loadingCursor;
-    var g_linesHeight = 0, g_currentLines = [];
+    var $lbScreen, $loadingCursor;
+    var g_linesHeight = 0, g_currentLines = [], g_lineHeightPx, g_following = false;
+    var g_ws, g_connected, g_keepAliveIntervalId;
 
     $(function () {
-        $ltScreen = $('.lt-screen');
+        $lbScreen = $('.lb-screen');
         $loadingCursor = $('.cursor-blink');
 
         g_linesHeight = getScreenHeight();
+        g_lineHeightPx = $('.lb-logline').first().outerHeight(true);
+        console.log('line height: ' + g_lineHeightPx);
 
-        $ltScreen.empty();
+        $lbScreen.empty();
         window.addEventListener('resize', debounce(
             function () {
                 g_linesHeight = getScreenHeight();
@@ -23,34 +26,65 @@
         $('#downBut').on('click', pageDownClick);
         $('#startBut').on('click', startClick);
         $('#endBut').on('click', endClick);
+        $('#followBut').on('click', followClick);
+        $('#stopFollowBut').on('click', stopFollowClick);
 
         $(document).keydown(function (e) {
             if (e.keyCode === 34) {
+                if (g_following) {
+                    return;
+                }
                 console.log('Page down');
                 nextPage();
 
             } else if (e.keyCode === 33) {
+                if (g_following) {
+                    return;
+                }
                 console.log('Page up');
                 previousPage();
 
             } else if (e.keyCode === 40) {
+                if (g_following) {
+                    return;
+                }
                 console.log('Arrow down');
                 nextLine();
 
             } else if (e.keyCode === 38) {
+                if (g_following) {
+                    return;
+                }
                 console.log('Arrow up');
                 previousLine();
 
             } else if (e.keyCode === 36) {
+                if (g_following) {
+                    return;
+                }
                 console.log('Init');
                 firstPage();
 
             } else if (e.keyCode === 35) {
+                if (g_following) {
+                    return;
+                }
                 console.log('End');
                 lastPage();
 
             } else if (e.keyCode === 70 && e.shiftKey) {
+                if (g_following) {
+                    return;
+                }
                 console.log('F');
+                followLog();
+
+            } else if (e.keyCode === 27) {
+                if (!g_following) {
+                    return;
+                }
+                console.log('ESC');
+                stopFollowLog();
             }
         });
 
@@ -58,18 +92,20 @@
             debounce(
                 function () {
                     var value = $(this).val();
-                    console.log(value);
                     seekPosition(value);
                 }, 500));
 
-        var ltScreenEl = $ltScreen.get(0);
-        if (ltScreenEl.addEventListener) {
-            ltScreenEl.addEventListener("mousewheel", onMouseWheel, false); // IE9, Chrome, Safari, Opera
-            ltScreenEl.addEventListener("DOMMouseScroll", onMouseWheel, false); // Firefox
+        var lbScreenEl = $lbScreen.get(0);
+        if (lbScreenEl.addEventListener) {
+            lbScreenEl.addEventListener("mousewheel", onMouseWheel, false); // IE9, Chrome, Safari, Opera
+            lbScreenEl.addEventListener("DOMMouseScroll", onMouseWheel, false); // Firefox
         }
     });
 
     var onMouseWheel = function (e) {
+        if (g_following) {
+            return true;
+        }
         var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
         if (delta > 0) {
             previousLine();
@@ -80,6 +116,9 @@
     };
 
     var pageUpClick = function (e) {
+        if (g_following) {
+            return true;
+        }
         console.log('up');
         $(this).blur();
 
@@ -87,6 +126,9 @@
     };
 
     var pageDownClick = function (e) {
+        if (g_following) {
+            return true;
+        }
         console.log('down');
         $(this).blur();
 
@@ -94,6 +136,9 @@
     };
 
     var startClick = function (e) {
+        if (g_following) {
+            return true;
+        }
         console.log('start');
         $(this).blur();
 
@@ -101,10 +146,31 @@
     };
 
     var endClick = function (e) {
+        if (g_following) {
+            return true;
+        }
         console.log('end');
         $(this).blur();
 
         lastPage();
+    };
+
+    var followClick = function (e) {
+        if (g_following) {
+            return true;
+        }
+        $(this).blur();
+
+        followLog();
+    };
+
+    var stopFollowClick = function (e) {
+        if (!g_following) {
+            return true;
+        }
+        $(this).blur();
+
+        stopFollowLog();
     };
 
     var previousPage = function () {
@@ -186,6 +252,33 @@
         fetchLines(g_linesHeight, position, 'seek');
     };
 
+    var followLog = function () {
+        g_following = true;
+        $('#followBut').hide();
+        $('#stopFollowBut').show();
+
+        $loadingCursor.css('visibility', 'visible');
+        $lbScreen.toggleClass('lb-following', true).empty();
+        $('#position-slider').val(1000).css('visibility', 'hidden');
+        $('#startBut,#upBut,#downBut,#endBut').attr('disabled', true);
+        g_currentLines = [];
+
+        wsConnect();
+    };
+
+    var stopFollowLog = function () {
+        g_following = false;
+        $('#followBut').show();
+        $('#stopFollowBut').hide();
+
+        $loadingCursor.css('visibility', 'hidden');
+        $lbScreen.toggleClass('lb-following', false);
+        $('#position-slider').val(1000).css('visibility', 'visible');
+        $('#startBut,#upBut,#downBut,#endBut').attr('disabled', false);
+
+        wsDisconnect();
+    };
+
     var isTopPosition = function () {
         var l = g_currentLines.length;
         if (l === 0) {
@@ -194,15 +287,14 @@
         return g_currentLines[0].start === 0;
     };
     var getScreenHeight = function () {
-        var sh = $ltScreen.outerHeight(true) - 10;
-        var lh = $('.lt-logline').first().outerHeight(true);
+        var sh = $lbScreen.outerHeight(true) - 10;
+        var lh = $('.lb-logline').first().outerHeight(true);
         var res = Math.floor(sh / lh);
         console.log(sh + ' / ' + lh + ' = ' + res);
         return res;
     };
 
     var fetchLines = function (lineCount, fromPos, action) {
-        // $ltScreen.toggleClass('lt-updating', true);
         $loadingCursor.css('visibility', 'visible');
         $.ajax({
             url: svcUrl,
@@ -213,31 +305,36 @@
                 from: fromPos,
                 action: action
             }
-        }).done(function (resp) {
+        }).done(function (resp, textStatus, xhr) {
             console.log(resp);
             g_currentLines = resp.lines || [];
             showLines(g_currentLines);
+            if (action === 'end') {
+                setTimeout(removeTopOverflownRows, 0);
+            } else {
+                setTimeout(removeOverflownRows, 0);
+            }
+
             var offset = resp.lines.length === 0 ? 0 : resp.lines[0].start;
             var position = resp.size === 0 ? 0 : Math.round((offset / resp.size) * 1000);
             $('#position-slider').val(position);
-            // $ltScreen.toggleClass('lt-updating', false);
             $loadingCursor.css('visibility', 'hidden');
 
-        }).fail(function (jqXHR, textStatus) {
-            // TODO
-            // $ltScreen.toggleClass('lt-updating', false);
+        }).fail(function (xhr, textStatus) {
             $loadingCursor.css('visibility', 'hidden');
+            if (xhr.status === 401) {
+                window.location.reload();
+            }
         });
     };
 
     var showLines = function (lines) {
         var lineEl, i, linesEl = [], l = lines.length;
         for (i = 0; i < l; i++) {
-            lineEl = $('<span/>').addClass('lt-logline').text(lines[i].value);
+            lineEl = $('<span/>').addClass('lb-logline').text(lines[i].value);
             linesEl.push(lineEl);
         }
-        $ltScreen.empty().append(linesEl);
-        setTimeout(removeOverflownRows, 0);
+        $lbScreen.empty().append(linesEl);
     };
 
     var debounce = function (func, wait, immediate) {
@@ -260,7 +357,7 @@
     };
 
     var removeOverflownRows = function () {
-        var rows = $ltScreen.children(), r, l = rows.length, row;
+        var rows = $lbScreen.children(), r, l = rows.length, row;
         if (l <= 1) {
             return;
         }
@@ -273,9 +370,83 @@
             if (isRowVisible) {
                 break;
             }
-            rows[r].remove();
+            // rows[r].remove();
             g_currentLines.pop();
         }
+    };
+
+    var removeTopOverflownRows = function () {
+        var rows = $lbScreen.children(), r, l = rows.length, row;
+        if (l <= 1) {
+            return;
+        }
+
+        var lineCount = 0;
+        for (r = l - 1; r >= 0; r--) {
+            row = rows[r];
+            var rect = row.getBoundingClientRect();
+            lineCount += Math.ceil(rect.height / g_lineHeightPx);
+            if (lineCount > g_linesHeight) {
+                break;
+            }
+        }
+
+        for (; r >= 0; r--) {
+            rows[r].remove();
+            g_currentLines.splice(r, 1);
+        }
+    };
+
+    // WS - EVENTS
+
+    var wsConnect = function () {
+        g_ws = new WebSocket(getWebSocketUrl(svcUrl, g_linesHeight), ['logbrowser']);
+        g_ws.onopen = onWsOpen;
+        g_ws.onclose = onWsClose;
+        g_ws.onmessage = onWsMessage;
+    };
+
+    var wsDisconnect = function () {
+        clearInterval(g_keepAliveIntervalId);
+        if (g_ws) {
+            g_connected = false;
+            g_ws.onclose = undefined;
+            g_ws.close();
+        }
+    };
+
+    var onWsOpen = function () {
+        console.log('connect WS');
+        g_keepAliveIntervalId = setInterval(function () {
+            if (g_connected) {
+                g_ws.send('{"action":"KeepAlive"}');
+            }
+        }, 30 * 1000);
+        g_connected = true;
+    };
+
+    var onWsClose = function () {
+        clearInterval(g_keepAliveIntervalId);
+        g_connected = false;
+
+        setTimeout(wsConnect, 5000); // attempt to reconnect
+    };
+
+    var onWsMessage = function (event) {
+        var resp = JSON.parse(event.data);
+        console.log(resp);
+
+        g_currentLines = g_currentLines.concat(resp.lines);
+        if (g_currentLines.length > g_linesHeight) {
+            g_currentLines.splice(0, g_linesHeight - g_currentLines.length);
+        }
+        showLines(g_currentLines);
+        setTimeout(removeTopOverflownRows, 0);
+    };
+
+    var getWebSocketUrl = function (path, lineCount) {
+        var l = window.location;
+        return ((l.protocol === "https:") ? "wss://" : "ws://") + l.host + path + '?lineCount=' + lineCount;
     };
 
 }($, SVC_URL));
