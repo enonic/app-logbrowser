@@ -28,6 +28,14 @@
         $('#endBut').on('click', endClick);
         $('#followBut').on('click', followClick);
         $('#stopFollowBut').on('click', stopFollowClick);
+        $('#searchBut').on('click', searchClick);
+        $('.lb-close').on('click', closeSearchClick);
+        $('.lb-overlay').on('click', function (e) {
+            closeSearchClick(e);
+        });
+        $('.lb-popup').on('click', function (e) {
+            e.stopPropagation();
+        });
 
         $(document).keydown(function (e) {
             if (e.keyCode === 34) {
@@ -80,6 +88,10 @@
                 followLog();
 
             } else if (e.keyCode === 27) {
+                if ($('#searchModal').hasClass('lb-popup-show')) {
+                    $('#searchModal').toggleClass('lb-popup-show', false);
+                    return;
+                }
                 if (!g_following) {
                     return;
                 }
@@ -173,6 +185,22 @@
         stopFollowLog();
     };
 
+    var searchClick = function (e) {
+        $(this).blur();
+
+        $('#searchModal').toggleClass('lb-popup-show', true);
+        setTimeout(function () {
+            $('.lb-search-term').focus();
+        }, 500);
+    };
+
+    var closeSearchClick = function (e) {
+        e.preventDefault();
+        $(this).blur();
+
+        $('#searchModal').toggleClass('lb-popup-show', false);
+    };
+
     var previousPage = function () {
         if (isTopPosition()) {
             return;
@@ -260,7 +288,7 @@
         $loadingCursor.css('visibility', 'visible');
         $lbScreen.toggleClass('lb-following', true).empty();
         $('#position-slider').val(1000).css('visibility', 'hidden');
-        $('#startBut,#upBut,#downBut,#endBut').attr('disabled', true);
+        $('#startBut,#upBut,#downBut,#endBut,#searchBut').attr('disabled', true);
         g_currentLines = [];
 
         wsConnect();
@@ -274,7 +302,7 @@
         $loadingCursor.css('visibility', 'hidden');
         $lbScreen.toggleClass('lb-following', false);
         $('#position-slider').val(1000).css('visibility', 'visible');
-        $('#startBut,#upBut,#downBut,#endBut').attr('disabled', false);
+        $('#startBut,#upBut,#downBut,#endBut,#searchBut').attr('disabled', false);
 
         wsDisconnect();
     };
