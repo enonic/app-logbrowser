@@ -3,7 +3,8 @@
 
     var $lbScreen, $loadingCursor;
     var g_linesHeight = 0, g_currentLines = [], g_lineHeightPx, g_following = false;
-    var g_ws, g_connected, g_keepAliveIntervalId;
+    var g_ws, g_connected, g_keepAliveIntervalId, g_modalActive = false, g_searchText = '', g_searchMatchCase = false,
+        g_searchRegex = false;
 
     $(function () {
         $lbScreen = $('.lb-screen');
@@ -11,7 +12,6 @@
 
         g_linesHeight = getScreenHeight();
         g_lineHeightPx = $('.lb-logline').first().outerHeight(true);
-        console.log('line height: ' + g_lineHeightPx);
 
         $lbScreen.empty();
         window.addEventListener('resize', debounce(
@@ -36,67 +36,73 @@
         $('.lb-popup').on('click', function (e) {
             e.stopPropagation();
         });
+        $('.lb-search-popup-button').on('click', applySearchClick);
+        $('.lb-search-term').keydown(function (e) {
+            if (e.keyCode === 13) {
+                e.preventDefault();
+                applySearchClick(e);
+            }
+        });
 
         $(document).keydown(function (e) {
+            if (e.keyCode === 27) {
+                if ($('#searchModal').hasClass('lb-popup-show')) {
+                    $('#searchModal').toggleClass('lb-popup-show', false);
+                    g_modalActive = false;
+                    return;
+                } else if (g_following) {
+                    stopFollowLog();
+                }
+            }
+
+            if (g_modalActive) {
+                return;
+            }
             if (e.keyCode === 34) {
                 if (g_following) {
                     return;
                 }
-                console.log('Page down');
                 nextPage();
 
             } else if (e.keyCode === 33) {
                 if (g_following) {
                     return;
                 }
-                console.log('Page up');
                 previousPage();
 
             } else if (e.keyCode === 40) {
                 if (g_following) {
                     return;
                 }
-                console.log('Arrow down');
                 nextLine();
 
             } else if (e.keyCode === 38) {
                 if (g_following) {
                     return;
                 }
-                console.log('Arrow up');
                 previousLine();
 
             } else if (e.keyCode === 36) {
                 if (g_following) {
                     return;
                 }
-                console.log('Init');
                 firstPage();
 
             } else if (e.keyCode === 35) {
                 if (g_following) {
                     return;
                 }
-                console.log('End');
                 lastPage();
 
             } else if (e.keyCode === 70 && e.shiftKey) {
                 if (g_following) {
                     return;
                 }
-                console.log('F');
                 followLog();
 
-            } else if (e.keyCode === 27) {
-                if ($('#searchModal').hasClass('lb-popup-show')) {
-                    $('#searchModal').toggleClass('lb-popup-show', false);
-                    return;
-                }
-                if (!g_following) {
-                    return;
-                }
-                console.log('ESC');
-                stopFollowLog();
+            } else if (e.keyCode === 70 && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault();
+                searchClick();
             }
         });
 
@@ -131,7 +137,6 @@
         if (g_following) {
             return true;
         }
-        console.log('up');
         $(this).blur();
 
         previousPage();
@@ -141,7 +146,6 @@
         if (g_following) {
             return true;
         }
-        console.log('down');
         $(this).blur();
 
         nextPage();
@@ -151,7 +155,6 @@
         if (g_following) {
             return true;
         }
-        console.log('start');
         $(this).blur();
 
         firstPage();
@@ -161,7 +164,6 @@
         if (g_following) {
             return true;
         }
-        console.log('end');
         $(this).blur();
 
         lastPage();
@@ -185,10 +187,15 @@
         stopFollowLog();
     };
 
-    var searchClick = function (e) {
+    var searchClick = function () {
         $(this).blur();
 
+        $('.lb-search-term').val(g_searchText);
+        $('#searchRegex').prop('checked', g_searchRegex);
+        $('#searchMatchCase').prop('checked', g_searchMatchCase);
+
         $('#searchModal').toggleClass('lb-popup-show', true);
+        g_modalActive = true;
         setTimeout(function () {
             $('.lb-search-term').focus();
         }, 500);
@@ -199,6 +206,20 @@
         $(this).blur();
 
         $('#searchModal').toggleClass('lb-popup-show', false);
+        g_modalActive = false;
+    };
+
+    var applySearchClick = function (e) {
+        $(this).blur();
+
+        $('#searchModal').toggleClass('lb-popup-show', false);
+        g_modalActive = false;
+
+        g_searchText = $('.lb-search-term').val();
+        g_searchRegex = $('#searchRegex').is(':checked');
+        g_searchMatchCase = $('#searchMatchCase').is(':checked');
+
+        showLines(g_currentLines);
     };
 
     var previousPage = function () {
@@ -318,7 +339,7 @@
         var sh = $lbScreen.outerHeight(true) - 10;
         var lh = $('.lb-logline').first().outerHeight(true);
         var res = Math.floor(sh / lh);
-        console.log(sh + ' / ' + lh + ' = ' + res);
+        // console.log(sh + ' / ' + lh + ' = ' + res);
         return res;
     };
 
@@ -357,9 +378,27 @@
     };
 
     var showLines = function (lines) {
-        var lineEl, i, linesEl = [], l = lines.length;
+        var lineEl, i, linesEl = [], l = lines.length, lineText, p, part;
+        var searchExpr = escapeRegExp(g_searchText);
+        var searchRegexp = new RegExp('(' + searchExpr + ')', 'gi');
         for (i = 0; i < l; i++) {
-            lineEl = $('<span/>').addClass('lb-logline').text(lines[i].value);
+            lineText = lines[i].value;
+            if (g_searchText) {
+                var parts = lineText.split(searchRegexp);
+
+                var lineParts = [];
+                for (p = 0; p < parts.length; p++) {
+                    part = parts[p];
+                    if (searchRegexp.test(part)) {
+                        lineParts.push($('<mark>').text(part));
+                    } else {
+                        lineParts.push(document.createTextNode(part));
+                    }
+                }
+                lineEl = $('<span/>').addClass('lb-logline').append(lineParts);
+            } else {
+                lineEl = $('<span/>').addClass('lb-logline').text(lineText);
+            }
             linesEl.push(lineEl);
         }
         $lbScreen.empty().append(linesEl);
@@ -462,7 +501,7 @@
 
     var onWsMessage = function (event) {
         var resp = JSON.parse(event.data);
-        console.log(resp);
+        // console.log(resp);
 
         g_currentLines = g_currentLines.concat(resp.lines);
         if (g_currentLines.length > g_linesHeight) {
@@ -475,6 +514,10 @@
     var getWebSocketUrl = function (path, lineCount) {
         var l = window.location;
         return ((l.protocol === "https:") ? "wss://" : "ws://") + l.host + path + '?lineCount=' + lineCount;
+    };
+
+    var escapeRegExp = function (str) {
+        return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
     };
 
 }($, SVC_URL));

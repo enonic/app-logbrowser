@@ -127,6 +127,11 @@ body > .lb-main-container {
     cursor: pointer;
 }
 
+.lb-logline mark {
+    background-color: #1b4185;
+    color: #d1f75f;
+}
+
 /* */
 .lb-button {
     width: auto;
@@ -405,7 +410,7 @@ input[type=range]:focus::-ms-fill-upper {
     border-radius: 5px;
     width: 50%;
     position: relative;
-    opacity: .85;
+    opacity: .90;
     transition: all 5s ease-in-out;
 }
 
@@ -417,8 +422,8 @@ input[type=range]:focus::-ms-fill-upper {
 
 .lb-popup .lb-close {
     position: absolute;
-    top: 20px;
-    right: 30px;
+    top: 0;
+    right: 20px;
     transition: all 200ms;
     font-size: 30px;
     font-weight: bold;
@@ -450,7 +455,6 @@ input[type=range]:focus::-ms-fill-upper {
     width: calc(100% - 50px);
     position: relative;
 
-    background: #f2f2f2;
     font-family: 'Open Sans', sans-serif;
 }
 
@@ -490,4 +494,36 @@ input[type=range]:focus::-ms-fill-upper {
     background-repeat: no-repeat;
     background-color: #563d7c;
     background-position: 7px 5px;
+}
+
+.lb-search-options {
+    padding-top: 20px;
+    color: #563d7c;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-around;
+}
+
+.lb-search-options label {
+    min-height: 20px;
+    padding-left: 20px;
+    margin-bottom: 0;
+    font-weight: 400;
+    cursor: pointer;
+}
+
+.lb-search-options input[type=checkbox] {
+    position: absolute;
+    margin-left: -16px;
+    line-height: normal;
+}
+
+.lb-search-actions {
+    padding-top: 20px;
+}
+
+.lb-search-modal-button {
+    background-color: #1f8dd6;
+    margin-right: 20px;
 }

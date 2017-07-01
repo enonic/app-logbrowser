@@ -57,6 +57,18 @@
             <input type="text" class="lb-search-term" placeholder="Type text to find in the log" autocorrect="off" autocapitalize="off" spellcheck="false">
             <button type="submit" class="lb-search-popup-button lb-search-icon"></button>
             <!--TODO Match case | Forward,Backward | Regex | Next | Prev-->
+            <div class="lb-search-options">
+                <label><input type="checkbox" name="matchCase" value="value" id="searchMatchCase">Match Case</label>
+                <label><input type="checkbox" name="regex" value="value" id="searchRegex">Regex</label>
+            </div>
+            <div class="lb-search-actions">
+                <button id="searchPrevBut" class="lb-search-modal-button lb-button">
+                    <span>Previous</span>
+                </button>
+                <button id="searchNextBut" class="lb-search-modal-button lb-button">
+                    <span>Next</span>
+                </button>
+            </div>
         </div>
     </div>
 </div>
