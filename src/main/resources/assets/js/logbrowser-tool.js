@@ -398,7 +398,7 @@
                 matchCase: g_searchMatchCase
             }
         }).done(function (resp, textStatus, xhr) {
-            console.log(resp);
+            // console.log(resp);
             $loadingCursor.css('visibility', 'hidden');
 
             if (action === 'searchForward' || action === 'searchBackward') {
@@ -534,7 +534,7 @@
     };
 
     var onWsOpen = function () {
-        console.log('connect WS');
+        // console.log('connect WS');
         g_keepAliveIntervalId = setInterval(function () {
             if (g_connected) {
                 g_ws.send('{"action":"KeepAlive"}');
