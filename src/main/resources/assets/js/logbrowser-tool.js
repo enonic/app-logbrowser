@@ -25,11 +25,11 @@
         fetchLines(g_linesHeight, 0, 'forward');
         $('#upBut').on('click', pageUpClick);
         $('#downBut').on('click', pageDownClick);
-        $('#startBut').on('click', startClick);
-        $('#endBut').on('click', endClick);
+        $('#startBut,#startMobBut').on('click', startClick);
+        $('#endBut,#endMobBut').on('click', endClick);
         $('#followBut').on('click', followClick);
         $('#stopFollowBut').on('click', stopFollowClick);
-        $('#searchBut').on('click', searchClick);
+        $('#searchBut,#searchMobBut').on('click', searchClick);
         $('.lb-close').on('click', closeSearchClick);
         $('.lb-overlay').on('click', function (e) {
             closeSearchClick(e);
@@ -349,7 +349,7 @@
         $loadingCursor.css('visibility', 'visible');
         $lbScreen.toggleClass('lb-following', true).empty();
         $('#position-slider').val(1000).css('visibility', 'hidden');
-        $('#startBut,#upBut,#downBut,#endBut,#searchBut').attr('disabled', true);
+        $('#startBut,#upBut,#downBut,#endBut,#searchBut,#startMobBut,#endMobBut,#searchMobBut').attr('disabled', true);
         g_currentLines = [];
 
         wsConnect();
@@ -363,7 +363,7 @@
         $loadingCursor.css('visibility', 'hidden');
         $lbScreen.toggleClass('lb-following', false);
         $('#position-slider').val(1000).css('visibility', 'visible');
-        $('#startBut,#upBut,#downBut,#endBut,#searchBut').attr('disabled', false);
+        $('#startBut,#upBut,#downBut,#endBut,#searchBut,#startMobBut,#endMobBut,#searchMobBut').attr('disabled', false);
 
         wsDisconnect();
     };

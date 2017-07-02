@@ -18,10 +18,16 @@
         <button id="startBut" class="lb-start-button lb-button">
             <span>Start</span>
         </button>
+        <button id="startMobBut" class="lb-start-mob-button lb-button">
+            <span>&nbsp;</span>
+        </button>
         <button id="upBut" class="lb-up-button lb-button">
             <span>&nbsp;</span>
         </button>
         <button id="downBut" class="lb-down-button lb-button">
+            <span>&nbsp;</span>
+        </button>
+        <button id="endMobBut" class="lb-end-mob-button lb-button">
             <span>&nbsp;</span>
         </button>
         <button id="endBut" class="lb-end-button lb-button">
@@ -35,6 +41,9 @@
         </button>
         <button id="searchBut" class="lb-search-button lb-button">
             <span>&nbsp; Search</span>
+        </button>
+        <button id="searchMobBut" class="lb-search-mob-button lb-button">
+            <span>&nbsp;</span>
         </button>
         <div class="lb-position">
             <input id="position-slider" class="slider" type="range" min="0" max="1000" step="10" value="0"/>
@@ -54,8 +63,11 @@
         <h2>Search</h2>
         <a class="lb-close" href="#">&times;</a>
         <div class="lb-search">
-            <input type="text" class="lb-search-term" placeholder="Type text to find in the log" autocorrect="off" autocapitalize="off" spellcheck="false">
-            <button type="submit" class="lb-search-popup-button lb-search-icon"></button>
+            <div class="lb-search-input">
+                <input type="text" class="lb-search-term" placeholder="Type text to find in the log" autocorrect="off" autocapitalize="off"
+                       spellcheck="false">
+                <button type="submit" class="lb-search-popup-button lb-search-icon"></button>
+            </div>
             <!--TODO Match case | Forward,Backward | Regex | Next | Prev-->
             <div class="lb-search-options">
                 <label><input type="checkbox" name="matchCase" value="value" id="searchMatchCase">Match Case</label>

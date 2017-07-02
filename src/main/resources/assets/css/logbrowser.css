@@ -205,10 +205,10 @@ body > .lb-main-container {
     -ms-flex-order: 2;
     -webkit-order: 2;
     order: 2;
-    flex: 0.8;
+    flex: 1;
 }
 
-.lb-up-button, .lb-down-button, .lb-start-button, .lb-end-button, .lb-tail-button, .lb-search-button {
+.lb-up-button, .lb-down-button, .lb-start-button, .lb-end-button, .lb-tail-button, .lb-search-button, .lb-start-mob-button, .lb-end-mob-button, .lb-search-mob-button {
     margin-top: 9px;
     margin-left: 10px;
 }
@@ -234,12 +234,43 @@ body > .lb-main-container {
     background-position: 5px 2px;
 }
 
-.lb-start-button, .lb-end-button {
+.lb-search-mob-button {
+    background: url(../img/ic_search_white_24px.svg);
+    background-repeat: no-repeat;
+    background-color: #563d7c;
+    background-position: center;
+}
+
+.lb-start-mob-button {
+    background: url(../img/ic_first_page_white_24px.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.lb-end-mob-button {
+    background: url(../img/ic_last_page_white_24px.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.lb-start-button, .lb-end-button, .lb-start-mob-button, .lb-end-mob-button {
     background-color: rgb(28, 184, 65);
 }
 
 .lb-tail-button {
     background-color: #f89406;
+}
+
+@media (min-width: 601px) {
+    .lb-start-mob-button, .lb-end-mob-button, .lb-search-mob-button {
+        display: none;
+    }
+}
+
+@media (max-width: 600px) {
+    .lb-start-button, .lb-end-button, .lb-tail-button, .lb-search-button {
+        display: none;
+    }
 }
 
 .lb-main-container {
@@ -398,6 +429,16 @@ input[type=range]:focus::-ms-fill-upper {
     .home-button-text {
         display: none;
     }
+
+    div.lb-popup {
+        width: 80%;
+    }
+}
+
+@media (max-width: 400px) {
+    div.lb-search-message {
+        font-size: 14px;
+    }
 }
 
 /*Search Modal*/
@@ -427,7 +468,7 @@ input[type=range]:focus::-ms-fill-upper {
     width: 50%;
     position: relative;
     opacity: .90;
-    transition: all 5s ease-in-out;
+    transition: all 2s ease-in-out;
 }
 
 .lb-popup h2 {
@@ -467,11 +508,14 @@ input[type=range]:focus::-ms-fill-upper {
 }
 
 .lb-search {
-    display: inline-block;
-    width: calc(100% - 50px);
-    position: relative;
-
+    width: 100%;
     font-family: 'Open Sans', sans-serif;
+}
+
+.lb-search-input {
+    display: inline-block;
+    position: relative;
+    width: calc(100% - 50px);
 }
 
 .lb-search-term {
