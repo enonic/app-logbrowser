@@ -9,6 +9,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import com.enonic.xp.script.bean.BeanContext;
 import com.enonic.xp.script.bean.ScriptBean;
@@ -26,6 +28,12 @@ public class LogFileHandler
 
     private String action;
 
+    private String search;
+
+    private Boolean regex = false;
+
+    private Boolean matchCase = false;
+
 
     public void setLineCount( final Long lineCount )
     {
@@ -40,6 +48,21 @@ public class LogFileHandler
     public void setAction( final String action )
     {
         this.action = action;
+    }
+
+    public void setSearch( final String search )
+    {
+        this.search = search;
+    }
+
+    public void setRegex( final Boolean regex )
+    {
+        this.regex = regex == null ? this.regex : regex;
+    }
+
+    public void setMatchCase( final Boolean matchCase )
+    {
+        this.matchCase = matchCase == null ? this.matchCase : matchCase;
     }
 
     public LogLinesMapper getLines()
@@ -68,7 +91,27 @@ public class LogFileHandler
     private List<LogLine> readLines( final RandomAccessFile raf, final String action, final long lineCount, final long from )
         throws IOException
     {
-        if ( "forward".equals( action ) )
+        if ( "searchForward".equals( action ) )
+        {
+            final long searchMatchPos = findText( raf, from, this.search, ReadDirection.FORWARDS );
+            if ( searchMatchPos == -1 )
+            {
+                return Collections.emptyList();
+            }
+            final List<LogLine> lines = readLines( raf, lineCount, searchMatchPos, ReadDirection.FORWARDS );
+            return lines;
+        }
+        if ( "searchBackward".equals( action ) )
+        {
+            final long searchMatchPos = findText( raf, from, this.search, ReadDirection.BACKWARDS );
+            if ( searchMatchPos == -1 )
+            {
+                return Collections.emptyList();
+            }
+            final List<LogLine> lines = readLines( raf, lineCount, searchMatchPos, ReadDirection.FORWARDS );
+            return lines;
+        }
+        else if ( "forward".equals( action ) )
         {
             final List<LogLine> lines = readLines( raf, lineCount, from, ReadDirection.FORWARDS );
             if ( !lines.isEmpty() )
@@ -113,6 +156,110 @@ public class LogFileHandler
         {
             return Collections.emptyList();
         }
+    }
+
+    private long findText( final RandomAccessFile file, long fromOffset, final String search, final ReadDirection direction )
+        throws IOException
+    {
+        if ( search == null || search.length() == 0 )
+        {
+            return -1;
+        }
+
+        final long fileLength = file.length() - 1;
+        ByteArrayOutputStream lineBytes = new ByteArrayOutputStream();
+
+        final boolean forward = direction == ReadDirection.FORWARDS;
+        if ( !forward && fromOffset <= 0 )
+        {
+            return -1;
+        }
+        if ( forward && fromOffset >= fileLength )
+        {
+            return -1;
+        }
+
+        fromOffset = fromOffset < 0 ? 0 : fromOffset;
+        fromOffset = fromOffset > fileLength ? fileLength : fromOffset;
+
+        long lineStart = fromOffset;
+        final String searchText = matchCase ? search : search.toUpperCase();
+
+        final Pattern regexPattern;
+        try
+        {
+            regexPattern = regex ? Pattern.compile( search, matchCase ? 0 : Pattern.CASE_INSENSITIVE ) : null;
+        }
+        catch ( PatternSyntaxException e )
+        {
+            return -1;// Invalid regex pattern
+        }
+
+        for ( long filePointer = fromOffset; filePointer < fileLength && filePointer != -1; )
+        {
+            file.seek( filePointer );
+            int readByte = file.readByte();
+
+            if ( readByte == LF || readByte == CR )
+            {
+                if ( filePointer < fileLength )
+                {
+                    final String lineText = newString( lineBytes, !forward );
+                    if ( regexPattern != null && regexPattern.matcher( lineText ).find() )
+                    {
+                        return forward ? lineStart : filePointer;
+                    }
+                    else
+                    {
+                        if ( !matchCase && lineText.toUpperCase().contains( searchText ) )
+                        {
+                            return forward ? lineStart : filePointer;
+                        }
+                        else if ( matchCase && lineText.contains( searchText ) )
+                        {
+                            return forward ? lineStart : filePointer;
+                        }
+                    }
+
+                    lineBytes = new ByteArrayOutputStream();
+                    lineStart = filePointer + 1;
+                }
+            }
+            else
+            {
+                lineBytes.write( readByte );
+            }
+
+            if ( forward )
+            {
+                filePointer++;
+            }
+            else
+            {
+                filePointer--;
+            }
+        }
+
+        if ( lineBytes.size() > 0 )
+        {
+            final String lineText = newString( lineBytes, !forward );
+            if ( regexPattern != null && regexPattern.matcher( lineText ).find() )
+            {
+                return lineStart;
+            }
+            else
+            {
+                if ( !matchCase && lineText.toUpperCase().contains( searchText ) )
+                {
+                    return 0;
+                }
+                else if ( matchCase && lineText.contains( searchText ) )
+                {
+                    return 0;
+                }
+            }
+        }
+        return -1;
     }
 
     private List<LogLine> readLines( final RandomAccessFile file, final long maxLines, long fromOffset, final ReadDirection direction )

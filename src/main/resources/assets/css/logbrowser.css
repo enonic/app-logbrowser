@@ -128,8 +128,24 @@ body > .lb-main-container {
 }
 
 .lb-logline mark {
-    background-color: #1b4185;
-    color: #d1f75f;
+    background-color: #b3b300;
+    color: #000;
+    animation-name: lb-logline-highlight;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in-out;
+}
+
+@keyframes lb-logline-highlight {
+    0% {
+        background-color: #b3b300;
+    }
+    50% {
+        background-color: #CACA00
+    }
+    100% {
+        background-color: #b3b300;
+    }
 }
 
 /* */
@@ -392,7 +408,7 @@ input[type=range]:focus::-ms-fill-upper {
     bottom: 0;
     left: 0;
     right: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.3);
     transition: opacity 500ms;
     visibility: hidden;
     opacity: 0;
@@ -404,7 +420,7 @@ input[type=range]:focus::-ms-fill-upper {
 }
 
 .lb-popup {
-    margin: 70px auto;
+    margin: 200px auto;
     padding: 20px;
     background: #fff;
     border-radius: 5px;
@@ -521,9 +537,18 @@ input[type=range]:focus::-ms-fill-upper {
 
 .lb-search-actions {
     padding-top: 20px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
 }
 
 .lb-search-modal-button {
     background-color: #1f8dd6;
     margin-right: 20px;
+}
+
+.lb-search-message {
+    color: darkred;
+    visibility: hidden;
+    font-size: 18px;
 }

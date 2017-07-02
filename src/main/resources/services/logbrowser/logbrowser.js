@@ -6,7 +6,7 @@ var webSocketLib = require('/lib/xp/websocket');
 var handlePost = function (req) {
     var action = req.params.action;
 
-    if (action === 'forward' || action === 'backward' || action === 'end' || action === 'seek') {
+    if (action === 'forward' || action === 'backward' || action === 'end' || action === 'seek' || action === 'searchForward' || action === 'searchBackward') {
         return getLines(req, action);
     }
 
@@ -18,12 +18,18 @@ var handlePost = function (req) {
 var getLines = function (req, action) {
     var from = req.params.from || '0';
     var lineCount = req.params.lineCount || '0';
+    var searchText = req.params.search || '';
+    var regex = req.params.regex === 'true';
+    var matchCase = req.params.matchCase === 'true';
     action = action || 'forward';
 
     var linesResult = logFileLib.getLines({
         lineCount: lineCount,
         from: from,
-        action: action
+        action: action,
+        search: searchText,
+        regex: regex,
+        matchCase: matchCase
     });
 
     return {
@@ -68,7 +74,7 @@ var handleWebSocket = function (event) {
         webSocketLib.send(sessionId, JSON.stringify(lastLinesResult));
 
         // start listening and sending new lines
-        logFileLib.newLogListener(sessionId, lastLinesResult.size,lineCount, function (lines) {
+        logFileLib.newLogListener(sessionId, lastLinesResult.size, lineCount, function (lines) {
             var msg = JSON.stringify(lines);
             webSocketLib.send(sessionId, msg);
         });

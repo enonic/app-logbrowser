@@ -5,14 +5,18 @@ exports.getLines = function (params) {
     bean.lineCount = params.lineCount;
     bean.from = params.from;
     bean.action = params.action || 'forward';
+    bean.search = params.search;
+    bean.regex = params.regex;
+    bean.matchCase = params.matchCase;
+
     return __.toNativeObject(bean.getLines());
 };
 
-exports.newLogListener = function (id, initialPos,lineCount, onNewLogLines) {
+exports.newLogListener = function (id, initialPos, lineCount, onNewLogLines) {
     var callback = function (newLines) {
         onNewLogLines(__.toNativeObject(newLines));
     };
-    return logTailManager.newLogTailHandler(id, initialPos,lineCount, callback);
+    return logTailManager.newLogTailHandler(id, initialPos, lineCount, callback);
 };
 
 exports.cancelLogListener = function (id) {

@@ -4,6 +4,7 @@
     var $lbScreen, $loadingCursor;
     var g_linesHeight = 0, g_currentLines = [], g_lineHeightPx, g_following = false;
     var g_ws, g_connected, g_keepAliveIntervalId, g_modalActive = false, g_searchText = '', g_searchMatchCase = false,
+        g_searchForward = true,
         g_searchRegex = false;
 
     $(function () {
@@ -37,6 +38,14 @@
             e.stopPropagation();
         });
         $('.lb-search-popup-button').on('click', applySearchClick);
+        $('#searchNextBut').on('click', function () {
+            g_searchForward = true;
+            doSearch();
+        });
+        $('#searchPrevBut').on('click', function () {
+            g_searchForward = false;
+            doSearch();
+        });
         $('.lb-search-term').keydown(function (e) {
             if (e.keyCode === 13) {
                 e.preventDefault();
@@ -56,6 +65,10 @@
             }
 
             if (g_modalActive) {
+                if (e.keyCode === 70 && (e.ctrlKey || e.metaKey)) {
+                    e.preventDefault();
+                    $('.lb-search-term').select().focus();
+                }
                 return;
             }
             if (e.keyCode === 34) {
@@ -193,9 +206,11 @@
         $('.lb-search-term').val(g_searchText);
         $('#searchRegex').prop('checked', g_searchRegex);
         $('#searchMatchCase').prop('checked', g_searchMatchCase);
+        $('.lb-search-message').css('visibility', 'hidden');
 
         $('#searchModal').toggleClass('lb-popup-show', true);
         g_modalActive = true;
+        $('.lb-search-term').select();
         setTimeout(function () {
             $('.lb-search-term').focus();
         }, 500);
@@ -212,14 +227,39 @@
     var applySearchClick = function (e) {
         $(this).blur();
 
-        $('#searchModal').toggleClass('lb-popup-show', false);
-        g_modalActive = false;
+        // $('#searchModal').toggleClass('lb-popup-show', false);
+        // g_modalActive = false;
 
+        doSearch();
+    };
+
+    var doSearch = function () {
+        $('.lb-search-message').css('visibility', 'hidden');
         g_searchText = $('.lb-search-term').val();
         g_searchRegex = $('#searchRegex').is(':checked');
         g_searchMatchCase = $('#searchMatchCase').is(':checked');
 
         showLines(g_currentLines);
+
+        var firstLine, fromPos;
+
+        if (g_searchForward) {
+            if (g_currentLines.length === 0) {
+                fromPos = 0;
+            } else {
+                firstLine = g_currentLines[0];
+                fromPos = firstLine.end + 1;
+            }
+        } else {
+            if (g_currentLines.length === 0) {
+                fromPos = 0;
+            } else {
+                firstLine = g_currentLines[0];
+                fromPos = firstLine.start - 1;
+            }
+        }
+
+        fetchLines(g_linesHeight, fromPos, g_searchForward ? 'searchForward' : 'searchBackward', g_searchText);
     };
 
     var previousPage = function () {
@@ -343,7 +383,7 @@
         return res;
     };
 
-    var fetchLines = function (lineCount, fromPos, action) {
+    var fetchLines = function (lineCount, fromPos, action, searchText) {
         $loadingCursor.css('visibility', 'visible');
         $.ajax({
             url: svcUrl,
@@ -352,10 +392,22 @@
             data: {
                 lineCount: lineCount,
                 from: fromPos,
-                action: action
+                action: action,
+                search: searchText,
+                regex: g_searchRegex,
+                matchCase: g_searchMatchCase
             }
         }).done(function (resp, textStatus, xhr) {
             console.log(resp);
+            $loadingCursor.css('visibility', 'hidden');
+
+            if (action === 'searchForward' || action === 'searchBackward') {
+                if (resp.lines.length === 0) {
+                    $('.lb-search-message').css('visibility', 'visible');
+                    return;
+                }
+            }
+
             g_currentLines = resp.lines || [];
             showLines(g_currentLines);
             if (action === 'end') {
@@ -367,7 +419,6 @@
             var offset = resp.lines.length === 0 ? 0 : resp.lines[0].start;
             var position = resp.size === 0 ? 0 : Math.round((offset / resp.size) * 1000);
             $('#position-slider').val(position);
-            $loadingCursor.css('visibility', 'hidden');
 
         }).fail(function (xhr, textStatus) {
             $loadingCursor.css('visibility', 'hidden');
@@ -379,8 +430,8 @@
 
     var showLines = function (lines) {
         var lineEl, i, linesEl = [], l = lines.length, lineText, p, part;
-        var searchExpr = escapeRegExp(g_searchText);
-        var searchRegexp = new RegExp('(' + searchExpr + ')', 'gi');
+        var searchExpr = g_searchRegex ? g_searchText : escapeRegExp(g_searchText);
+        var searchRegexp = new RegExp('(' + searchExpr + ')', g_searchMatchCase ? 'g' : 'gi');
         for (i = 0; i < l; i++) {
             lineText = lines[i].value;
             if (g_searchText) {
