@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <tool xmlns="urn:enonic:xp:model:1.0">
   <display-name>Log Browser</display-name>
-  <description>Browse and search in the log file</description>
+  <description>Browse and search the log</description>
   <allow>
     <principal>role:system.admin</principal>
   </allow>
