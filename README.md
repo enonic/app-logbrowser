@@ -4,8 +4,6 @@
 
 This app allows remote browsing of the XP log file.
 
-<img align="right" alt="Log Browser screenshot" src="https://rawgithub.com/aro/app-logbrowser/master/src/main/resources/assets/img/screenshot.png">
-
 ## Features
 
 - View and navigate XP log file remotely from the browser
@@ -29,6 +27,8 @@ The following keyboard shortcuts are available in the app:
 | <kbd>CONTROL</kbd>+<kbd>F</kbd> | Open the Search/Find dialog |
 
 In addition the mouse wheel can be used for navigating up and down the file. 
+
+<img alt="Log Browser screenshot" src="https://rawgithub.com/aro/app-logbrowser/master/src/main/resources/assets/img/screenshot.png" width="480">
 
 ## Releases and Compatibility
 
