@@ -4,12 +4,37 @@
 
 This app allows remote browsing of the XP log file.
 
+<img align="right" alt="Log Browser screenshot" src="https://rawgithub.com/aro/app-logbrowser/master/src/main/resources/assets/img/screenshot.png">
+
+## Features
+
+- View and navigate XP log file remotely from the browser
+- Search for text in the log
+- Search using regular expressions or case sensitive match
+- Highlighting of search text
+
+## Keyboard shortcuts
+
+The following keyboard shortcuts are available in the app:
+
+| Keyboard Shortcut | Description |
+| ----------- | ------------------- |
+| <kbd>↓</kbd> | Navigate forward one line |
+| <kbd>↑</kbd> | Navigate backward one line |
+| <kbd>Page Down</kbd> | Navigate forward one page |
+| <kbd>Page Up</kbd> | Navigate backward one page |
+| <kbd>Home</kbd> | Navigate to the beginning of the file |
+| <kbd>End</kbd> | Navigate to the end of the file |
+| <kbd>SHIFT</kbd>+<kbd>F</kbd> | Scroll Forward, aka "tail -f" |
+| <kbd>CONTROL</kbd>+<kbd>F</kbd> | Open the Search/Find dialog |
+
+In addition the mouse wheel can be used for navigating up and down the file. 
 
 ## Releases and Compatibility
 
 | App version | Required XP version |
 | ----------- | ------------------- |
-| TO | DO |
+| 1.0.0 | 6.10.0 |
 
 
 ## Building and deploying
