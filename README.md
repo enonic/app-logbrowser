@@ -1,4 +1,4 @@
-# Log Browser App for Enonic XP
+# Log Browser admin tool for Enonic XP
 
 <img align="right" alt="Log Browser Logo" src="https://rawgithub.com/aro/app-logbrowser/master/src/main/resources/assets/img/logbrowser.svg" width="128">
 
@@ -30,6 +30,10 @@ The following keyboard shortcuts are available in the app:
 In addition the mouse wheel can be used for navigating up and down the file. 
 
 <img alt="Log Browser screenshot" src="https://rawgithub.com/aro/app-logbrowser/master/src/main/resources/assets/img/screenshot.png" width="480">
+
+## Notes
+
+A user needs to have the `system.admin` _role_ to be able to use this tool.
 
 ## Releases and Compatibility
 
