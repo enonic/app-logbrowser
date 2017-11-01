@@ -24,7 +24,7 @@ The following keyboard shortcuts are available in the app:
 | <kbd>Home</kbd> | Navigate to the beginning of the file |
 | <kbd>End</kbd> | Navigate to the end of the file |
 | <kbd>SHIFT</kbd>+<kbd>F</kbd> | Scroll Forward, aka "tail -f" |
-| <kbd>CONTROL</kbd>+<kbd>F</kbd> | Open the Search/Find dialog |
+| <kbd>CTRL</kbd>+<kbd>F</kbd> or <kbd>cmd</kbd>+<kbd>F</kbd> | Open the Search/Find dialog |
 | <kbd>ESC</kbd> | Stop scroll Forward mode, or close Search dialog |
 
 In addition the mouse wheel can be used for navigating up and down the file. 
