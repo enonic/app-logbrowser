@@ -1,19 +1,18 @@
 package com.enonic.app.logbrowser;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import com.enonic.xp.home.HomeDir;
 
 public final class LogHelper
 {
 
     public static Path getLogPath()
     {
-        final String xpHome = System.getenv( "XP_HOME" );
-        if ( xpHome == null )
-        {
-            throw new RuntimeException( "" );
-        }
-        return Paths.get( xpHome, "logs", "server.log" );
+        final File xpHome = HomeDir.get().toFile();
+        return Paths.get( xpHome.getAbsolutePath(), "logs", "server.log" );
     }
 
 }
