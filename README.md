@@ -33,7 +33,8 @@ In addition the mouse wheel can be used for navigating up and down the file.
 
 ## Notes
 
-A user needs to have the `system.admin` _role_ to be able to use this tool.
+- A user needs to have the `system.admin` _role_ to get access to this tool.
+- The _Forward_ mode (aka "tail -f") uses WebSocket connections. If there is a front-end server or proxy blocking WebSocket connections, it won't work.
 
 ## Releases and Compatibility
 
