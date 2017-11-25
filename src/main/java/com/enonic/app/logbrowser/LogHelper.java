@@ -21,7 +21,7 @@ import static com.google.common.base.Suppliers.memoizeWithExpiration;
 
 public final class LogHelper
 {
-    private final static Supplier<Path> LOG_PATH_CACHE = memoizeWithExpiration( LogHelper::findLogPath, 1, TimeUnit.MINUTES );
+    private final static Supplier<Path> LOG_PATH_CACHE = memoizeWithExpiration( LogHelper::findLogPath, 10, TimeUnit.MINUTES );
 
     public static Path getLogPath()
     {
@@ -70,7 +70,6 @@ public final class LogHelper
         }
         catch ( Exception e )
         {
-            e.printStackTrace();
             return null;
         }
     }
