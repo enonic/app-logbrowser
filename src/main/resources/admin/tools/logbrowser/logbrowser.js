@@ -1,13 +1,16 @@
-var mustache = require('/lib/xp/mustache');
+var mustache = require('/lib/mustache');
 var portalLib = require('/lib/xp/portal');
+var adminLib = require('/lib/xp/admin');
 
 exports.get = function (req) {
     var view = resolve('./logbrowser.html');
 
     var svcUrl = portalLib.serviceUrl({service: 'logbrowser'});
     var params = {
-        adminUiAssetsUrl: portalLib.assetUrl({path: "", application: "com.enonic.xp.admin.ui"}),
-        launcherJsUrl: portalLib.assetUrl({path: "/js/launcher.js", application: "com.enonic.xp.admin.ui"}),
+        adminUiAssetsUrl: adminLib.getAssetsUri(),
+        //launcherJsUrl: portalLib.assetUrl({path: "/js/launcher.js", application: "com.enonic.xp.admin.ui"}),
+        launcherJsUrl: adminLib.getLauncherPath(),
+        launcherUrl: adminLib.getLauncherUrl(),
         assetsUri: portalLib.assetUrl({path: ""}),
         svcUrl: svcUrl
     };

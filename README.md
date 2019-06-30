@@ -40,6 +40,9 @@ In addition the mouse wheel can be used for navigating up and down the file.
 
 | App version | Required XP version |
 | ----------- | ------------------- |
+| 2.0.0 | 7.0.0 |
+| 1.0.2 | 6.10.0 |
+| 1.0.1 | 6.10.0 |
 | 1.0.0 | 6.10.0 |
 
 
