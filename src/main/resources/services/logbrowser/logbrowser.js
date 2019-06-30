@@ -1,4 +1,3 @@
-var portal = require('/lib/xp/portal');
 var logFileLib = require('/lib/logfile');
 var webSocketLib = require('/lib/xp/websocket');
 
