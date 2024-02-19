@@ -20,7 +20,7 @@ repositories {
 
 dependencies {
     implementation "com.enonic.xp:script-api:${xpVersion}"
-    include 'ch.qos.logback:logback-classic:1.4.14'
+    include 'ch.qos.logback:logback-classic:1.5.0'
     include "com.enonic.xp:lib-portal:${xpVersion}"
     include "com.enonic.xp:lib-websocket:${xpVersion}"
     include "com.enonic.xp:lib-admin:${xpVersion}"
