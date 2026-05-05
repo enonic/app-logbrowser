@@ -1,0 +1,5 @@
+kind: "Application"
+title: "Log Browser"
+description: "Browse and search the log"
+vendorName: "Enonic AS"
+vendorUrl: "https://enonic.com"

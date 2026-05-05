@@ -1,15 +1,7 @@
 plugins {
     id 'maven-publish'
-    id 'com.enonic.xp.app' version '3.6.2'
+    id 'com.enonic.xp.app'
     id 'com.enonic.defaults' version '2.1.6'
-}
-
-app {
-    name = project.appName
-    displayName = 'Log Browser'
-    vendorName = 'Enonic AS'
-    vendorUrl = 'https://enonic.com'
-    systemVersion = "${xpVersion}"
 }
 
 repositories {
@@ -19,10 +11,10 @@ repositories {
 }
 
 dependencies {
-    implementation "com.enonic.xp:script-api:${xpVersion}"
+    implementation xplibs.api.script
     include 'ch.qos.logback:logback-classic:1.5.32'
-    include "com.enonic.xp:lib-portal:${xpVersion}"
-    include "com.enonic.xp:lib-websocket:${xpVersion}"
-    include "com.enonic.xp:lib-admin:${xpVersion}"
+    include xplibs.portal
+    include xplibs.websocket
+    include xplibs.admin
     include "com.enonic.lib:lib-mustache:2.1.1"
 }
