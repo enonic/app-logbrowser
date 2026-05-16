@@ -1,0 +1,9 @@
+[versions]
+asset = "2.0.0-SNAPSHOT"
+logback-classic = "1.5.32"
+mustache = "2.1.1"
+
+[libraries]
+lib-asset = { module = "com.enonic.lib:lib-asset", version.ref = "asset" }
+lib-mustache = { module = "com.enonic.lib:lib-mustache", version.ref = "mustache" }
+logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback-classic" }
