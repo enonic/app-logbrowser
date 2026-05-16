@@ -3,3 +3,5 @@ title: "Log Browser"
 description: "Browse and search the log"
 allow:
   - "role:system.admin"
+apis:
+  - "asset"
