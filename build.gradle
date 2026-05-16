@@ -7,7 +7,7 @@ plugins {
 repositories {
     mavenLocal()
     mavenCentral()
-    xp.enonicRepo()
+    xp.enonicRepo('dev')
 }
 
 dependencies {
@@ -16,5 +16,6 @@ dependencies {
     include xplibs.portal
     include xplibs.websocket
     include xplibs.admin
+    include "com.enonic.lib:lib-asset:2.0.0-SNAPSHOT"
     include "com.enonic.lib:lib-mustache:2.1.1"
 }
