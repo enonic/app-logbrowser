@@ -12,10 +12,10 @@ repositories {
 
 dependencies {
     implementation xplibs.api.script
-    include 'ch.qos.logback:logback-classic:1.5.32'
+    include libs.logback.classic
     include xplibs.portal
     include xplibs.websocket
     include xplibs.admin
-    include "com.enonic.lib:lib-asset:2.0.0-SNAPSHOT"
-    include "com.enonic.lib:lib-mustache:2.1.1"
+    include libs.lib.asset
+    include libs.lib.mustache
 }
