@@ -1,7 +1,7 @@
 [versions]
 asset = "2.0.0"
 logback-classic = "1.5.34"
-mustache = "2.1.1"
+mustache = "3.0.0"
 
 [libraries]
 lib-asset = { module = "com.enonic.lib:lib-asset", version.ref = "asset" }
