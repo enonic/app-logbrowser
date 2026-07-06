@@ -1,5 +1,5 @@
 [versions]
-asset = "2.0.0"
+asset = "2.0.1"
 logback-classic = "1.5.37"
 mustache = "3.0.0"
 
