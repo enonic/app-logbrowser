@@ -1,6 +1,6 @@
 [versions]
 asset = "2.0.1"
-logback-classic = "1.6.0"
+logback-classic = "1.6.1"
 mustache = "3.0.0"
 
 [libraries]
