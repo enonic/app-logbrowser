@@ -2,12 +2,12 @@ var logTailManager = __.newBean('com.enonic.app.logbrowser.LogTailManager');
 
 exports.getLines = function (params) {
     var bean = __.newBean('com.enonic.app.logbrowser.LogFileHandler');
-    bean.lineCount = params.lineCount;
-    bean.from = params.from;
-    bean.action = params.action || 'forward';
-    bean.search = params.search;
-    bean.regex = params.regex;
-    bean.matchCase = params.matchCase;
+    bean.setLineCount(__.nullOrValue(params.lineCount));
+    bean.setFrom(__.nullOrValue(params.from));
+    bean.setAction(params.action || 'forward');
+    bean.setSearch(__.nullOrValue(params.search));
+    bean.setRegex(__.nullOrValue(params.regex));
+    bean.setMatchCase(__.nullOrValue(params.matchCase));
 
     return __.toNativeObject(bean.getLines());
 };
