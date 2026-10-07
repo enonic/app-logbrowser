@@ -5,3 +5,5 @@ allow:
   - "role:system.admin"
 apis:
   - "asset"
+  - "admin:extension"
+  - "admin:events"
